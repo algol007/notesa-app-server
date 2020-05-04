@@ -7,6 +7,7 @@ exports.sendChat = (req, res, next) => {
     .create({
       message: req.body.message,
       userId: req.body.userId,
+      room: req.body.room
     })
     .then(data => {
       res.status(201).send({
@@ -52,6 +53,39 @@ exports.getChatById = async (req, res, next) => {
       .findOne({
         where: {
           id: chatId
+        },
+      })
+      .then(data => {
+        res.status(200).send({
+          chat: data,
+        });
+      });
+    }
+  } catch(error) {
+    next(error);
+  }
+};
+
+exports.getChatRoom = async (req, res, next) => {
+  const room = req.params.room;
+
+  try {
+    const chat = await Chats.findOne({
+      where: {
+        room: room
+      }
+    });
+    if (!chat) {
+      res.status(200).json({
+        message: 'room not found!',
+        status: 0
+      });
+    }
+    else {
+      Chats
+      .findAndCountAll({
+        where: {
+          room: room
         },
       })
       .then(data => {
